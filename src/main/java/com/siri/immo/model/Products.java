@@ -8,6 +8,7 @@ public class Products {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(unique = true)
     private String libelle;
     private String type;
     private double prix;
