@@ -4,12 +4,10 @@ import com.siri.immo.model.Location;
 import com.siri.immo.model.Products;
 import com.siri.immo.repository.LocationRepository;
 import com.siri.immo.repository.ProductsRepository;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.MethodNotAllowedException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URISyntaxException;
@@ -40,9 +38,7 @@ public class ProductsController {
             List<Products> products = productsRepository.findAllByTypeAndStatut(type, statut);
             if (products.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }/*else{
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST)
-            }*/
+            }
             return ResponseEntity.ok().body(products);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

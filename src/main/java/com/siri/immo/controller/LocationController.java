@@ -23,18 +23,37 @@ public class LocationController {
     @Autowired
     private ProductsRepository productsRepository;
     @PostMapping("/create-location")
-    public ResponseEntity<Location> createLocation(@RequestBody Location location, HttpServletRequest httpServletRequest) throws URISyntaxException {
+    public ResponseEntity<Location> createLocation(@RequestHeader("type-location") String typeLocation, @RequestHeader("durre") int dureeLocation, @RequestBody Location location, HttpServletRequest httpServletRequest) throws URISyntaxException {
 
         Products productsLouer = location.getProduct();
         if (!productsLouer.getType().equals("a-louer")){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }else if ((location.getFinLocation()).before(location.getDebutLocation()) || location.getMontantRemis() < location.getMontantLocation()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        productsLouer.setStatut("loue");
-        productsRepository.save(productsLouer);
-        location.setDebutLocation(new Date());
-        Location result = locationRepository.save(location);
-        return new ResponseEntity(result, HttpStatus.OK);
+
+        double montantLocation = 0.0;
+        if (typeLocation.equals("mensuel")){
+            montantLocation = productsLouer.getPrix() * dureeLocation;
+        }else{
+            montantLocation = productsLouer.getPrixJournalier() * dureeLocation;
+        }
+        if (montantLocation > location.getMontantRemis()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }else{
+            productsLouer.setStatut("louer");
+            productsRepository.save(productsLouer);
+            location.setDebutLocation(new Date());
+            location.setTypeLocation(typeLocation);
+            location.setPrixLocation(productsLouer.getPrix());
+            location.setMontantLocation(montantLocation);
+            location.setReliquat(location.getMontantRemis() - location.getMontantLocation());
+            Location result = locationRepository.save(location);
+            return new ResponseEntity(result, HttpStatus.OK);
+
+        }
     }
+
 
     @GetMapping("/list-location")
     public ResponseEntity <List<Location>> getLocation(HttpServletRequest httpServletRequest) {
@@ -50,14 +69,17 @@ public class LocationController {
 
     }
 
-    /*@PutMapping("/update-location")
+    // Pour valider une location
+    @PutMapping("/update-location")
     public ResponseEntity<Location> updateLocations(@RequestBody Location location, HttpServletRequest httpServletRequest) throws URISyntaxException {
         if (location.getId() == null) {
         }
+        location.setValidation(true);
+        location.setDateValidation(new Date());
         Location result = locationRepository.save(location);
 
         return ResponseEntity.ok().body(result);
-    }*/
+    }
 
     @PutMapping("/restitution-location")
     public ResponseEntity<Location> restitutionLocations(@RequestBody Location location, HttpServletRequest httpServletRequest) throws URISyntaxException {

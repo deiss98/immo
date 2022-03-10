@@ -11,9 +11,12 @@ public class Products {
     @Column(unique = true)
     private String libelle;
     private String type;
+    // Prix de vente du Bien ou prix de location mensuel
     private double prix;
+    private double prixJournalier;
+    @Column(columnDefinition="TEXT")
     private String description;
-    private  String photo;
+    private String photo;
     private String statut;
     private Date dateAjout;
     private Date dateModification;
@@ -23,10 +26,11 @@ public class Products {
         super();
     }
 
-    public Products(String libelle, String type, double prix, String description, String photo, String statut, Date dateAjout, Date dateModification) {
+    public Products(String libelle, String type, double prix, double prixJournalier, String description, String photo, String statut, Date dateAjout, Date dateModification) {
         this.libelle = libelle;
         this.type = type;
         this.prix = prix;
+        this.prixJournalier = prixJournalier;
         this.description = description;
         this.photo = photo;
         this.statut = statut;
@@ -64,6 +68,14 @@ public class Products {
 
     public void setPrix(double prix) {
         this.prix = prix;
+    }
+
+    public double getPrixJournalier() {
+        return prixJournalier;
+    }
+
+    public void setPrixJournalier(double prixJournalier) {
+        this.prixJournalier = prixJournalier;
     }
 
     public String getDescription() {
